@@ -1,6 +1,6 @@
 'use strict';
 const Alexa = require("alexa-sdk");
-const appId = undefined;
+const appId = undefined; // amzn1.ask.skill.e5433c77-53dc-48ac-832a-a5afec18912f
 
 exports.handler = function(event, context, callback) {
     const alexa = Alexa.handler(event, context);
@@ -11,7 +11,7 @@ exports.handler = function(event, context, callback) {
 };
 
 const states = {
-    GUESSMODE: '_GUESSMODE', // User is trying to guess the number.
+    GAMEMODE: '_GAMEMODE', // User is trying to guess the number.
     STARTMODE: '_STARTMODE'  // Prompt the user to start or restart the game.
 };
 
@@ -22,7 +22,7 @@ const newSessionHandlers = {
             this.attributes['gamesPlayed'] = 0;
         }
         this.handler.state = states.STARTMODE;
-        this.response.speak('Welcome to High Low guessing game. You have played '
+        this.response.speak('Welcome to alphabet geography game. You have played '
             + this.attributes['gamesPlayed'].toString() + ' times. would you like to play?')
             .listen('Say yes to start the game or no to quit.');
         this.emit(':responseReady');
@@ -48,15 +48,15 @@ const startGameHandlers = Alexa.CreateStateHandler(states.STARTMODE, {
         this.emit('NewSession'); // Uses the handler in newSessionHandlers
     },
     'AMAZON.HelpIntent': function() {
-        const message = 'I will think of a number between zero and one hundred, try to guess and I will tell you if it' +
-            ' is higher or lower. Do you want to start the game?';
+        const message = 'I will say a name of place, then you say the name of a place which starts with the ending alphabet of what I said.' +
+            ' Then I say a name of new place which starts with alphabet of what you said and the game continues so on';
         this.response.speak(message).listen(message);
         this.emit(':responseReady');
     },
     'AMAZON.YesIntent': function() {
         this.attributes["guessNumber"] = Math.floor(Math.random() * 100);
-        this.handler.state = states.GUESSMODE;
-        this.response.speak('Great! ' + 'Try saying a number to start the game.').listen('Try saying a number.');
+        this.handler.state = states.GAMEMODE;
+        this.response.speak('Great! Try saying a name of place to start the game.').listen('Try saying a name of a place.');
         this.emit(':responseReady');
     },
     'AMAZON.NoIntent': function() {
@@ -88,7 +88,7 @@ const startGameHandlers = Alexa.CreateStateHandler(states.STARTMODE, {
     }
 });
 
-const guessModeHandlers = Alexa.CreateStateHandler(states.GUESSMODE, {
+const guessModeHandlers = Alexa.CreateStateHandler(states.GAMEMODE, {
     'NewSession': function () {
         this.handler.state = '';
         this.emitWithState('NewSession'); // Equivalent to the Start Mode NewSession handler
@@ -112,6 +112,12 @@ const guessModeHandlers = Alexa.CreateStateHandler(states.GUESSMODE, {
         } else {
             this.emit('NotANum');
         }
+    },
+    'NextWordIntent': function() {
+        const nextWord = this.event.request.intent.slots.word.value;
+        this.response.speak('You said the word ' + nextWord)
+            .listen(' Isnt that right.');
+        this.emit(':responseReady');
     },
     'AMAZON.HelpIntent': function() {
         this.response.speak('I am thinking of a number between zero and one hundred, try to guess and I will tell you' +

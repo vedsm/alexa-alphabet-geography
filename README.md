@@ -1,1 +1,1 @@
-Alphabet Geography Game for alexa
+Letter Altlas Game for alexa

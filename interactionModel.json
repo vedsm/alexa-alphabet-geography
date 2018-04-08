@@ -1,7 +1,7 @@
 {
     "interactionModel": {
         "languageModel": {
-            "invocationName": "alphabet geography",
+            "invocationName": "letter atlas",
             "intents": [
                 {
                     "name": "AMAZON.CancelIntent",
