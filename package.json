@@ -1,0 +1,26 @@
+{
+  "name": "alexa-alphabet-geography-game",
+  "version": "1.0.0",
+  "description": "Alphabet Geography game for Alexa",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vedsm/alexa-alphabet-geography.git"
+  },
+  "keywords": [
+    "Alexa",
+    "game",
+    "skill"
+  ],
+  "author": "ved.mulkalwar@gmail.com",
+  "license": "Apache-2.0",
+  "bugs": {
+  },
+  "homepage": "https://github.com/vedsm/alexa-alphabet-geography.git#readme",
+  "dependencies": {
+    "alexa-sdk": "^1.0.0"
+  }
+}
