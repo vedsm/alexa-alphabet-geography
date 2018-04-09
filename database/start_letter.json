@@ -3,12 +3,16 @@
         "asia",
         "america",
         "argentina",
-        "afghanistan"
+        "afghanistan",
+        "antarctica"
     ],
     "i": [
         "india"
     ],
     "b": [
         "bangalore"
+    ],
+    "n": [
+        "nigeria"
     ]
 }
