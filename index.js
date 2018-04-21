@@ -170,16 +170,8 @@ const guessModeHandlers = Alexa.CreateStateHandler(states.GAMEMODE, {
         if(END_LETTER[currentWord]) {
             let endLetterOfCurrentWord = END_LETTER[currentWord];
             if(saidPlaces.length === 0){ // first word
-                saidPlaces.push(currentWord);
                 //find a new word starting from last letter of currentWord
-                let nextWord = START_LETTER[endLetterOfCurrentWord][0];
-                let endLetterOfNextWord = END_LETTER[nextWord];
-                saidPlaces.push(nextWord);
-                this.attributes["saidPlaces"] = saidPlaces;
-
-                this.response.speak(this.t('NEXT_PLACE_NAME_STARTING_FROM_MESSAGE') + endLetterOfCurrentWord + this.t('IS') + nextWord)
-                    .listen(this.t('SAY_A_PLACE_NAME_STARTING_FROM_LETTER_MESSAGE') + endLetterOfNextWord);
-                this.emit(':responseReady');
+                this.emit('getNextWord', currentWord, saidPlaces)
             }
             else{ // not the first word
                 let lastWord = saidPlaces.slice(-1);
@@ -194,33 +186,8 @@ const guessModeHandlers = Alexa.CreateStateHandler(states.GAMEMODE, {
                     // console.log("startLetterOfCurrentWord->",startLetterOfCurrentWord);
                     if(endLetterOfLastWord == startLetterOfCurrentWord){ //last letter matches
                         //store the word and find next word
-                        saidPlaces.push(currentWord);
-                        let wordsStartingWithEndLetterOfCurrentWord = START_LETTER[END_LETTER[currentWord]];
-                        let selectedNextWord;
-                        for(let i=0;i<wordsStartingWithEndLetterOfCurrentWord.length;i++){
-                            let wordStartingWithEndLetterOfCurrentWord = wordsStartingWithEndLetterOfCurrentWord[i];
-                            if(saidPlaces.indexOf(wordStartingWithEndLetterOfCurrentWord) == -1){
-                                selectedNextWord = wordStartingWithEndLetterOfCurrentWord;
-                                break;
-                            }
-                        }
-                        if(selectedNextWord){
-                            saidPlaces.push(selectedNextWord);
-                            this.attributes["saidPlaces"] = saidPlaces;
-                            let endLetterOfSelectedNextWord = END_LETTER[selectedNextWord];
-                            this.response.speak(this.t('NEXT_PLACE_NAME_STARTING_FROM_MESSAGE') + endLetterOfCurrentWord + this.t('IS') + selectedNextWord)
-                                .listen(this.t('SAY_A_PLACE_NAME_STARTING_FROM_LETTER_MESSAGE') + endLetterOfSelectedNextWord);
-                            this.emit(':responseReady');
-                        }
-                        else{
-                            //Won the game!
-                            this.handler.state = states.STARTMODE;
-                            this.attributes['gamesPlayed']++;
-                            this.response.speak(this.t('I_DONT_KNOW_ANY_MORE_PLACE_NAME_STARTING_FROM_MESSAGE') + endLetterOfCurrentWord 
-                                + this.t('YOUR_HAVE_WON_THE_GAME'))
-                                .listen(this.t('YES_OR_NO_MESSAGE'));
-                            this.emit(':responseReady');
-                        }
+
+                        this.emit('getNextWord', currentWord, saidPlaces)
                     }
                     else{ //end letter of last word does not match start letter of 
                         this.response.speak(currentWord + this.t('DOES_NOT_START_WITH_LETTER_OF_MESSAGE') + lastWord)//_ does not start with the letter _
@@ -287,6 +254,36 @@ const guessAttemptHandlers = {
         this.response.speak(this.t('SORRY_AND_REPEAT_MESSAGE'))
         .listen(this.t('SAY_A_PLACE_NAME_MESSAGE'));
         this.emit(':responseReady');
+    },
+    'getNextWord': function(currentWord, saidPlaces){
+        saidPlaces.push(currentWord);
+        let endLetterOfCurrentWord = END_LETTER[currentWord];
+        let wordsStartingWithEndLetterOfCurrentWord = START_LETTER[endLetterOfCurrentWord];
+        let selectedNextWord;
+        for(let i=0;i<wordsStartingWithEndLetterOfCurrentWord.length;i++){
+            let wordStartingWithEndLetterOfCurrentWord = wordsStartingWithEndLetterOfCurrentWord[i];
+            if(saidPlaces.indexOf(wordStartingWithEndLetterOfCurrentWord) == -1){
+                selectedNextWord = wordStartingWithEndLetterOfCurrentWord;
+                break;
+            }
+        }
+        if(selectedNextWord){
+            saidPlaces.push(selectedNextWord);
+            this.attributes["saidPlaces"] = saidPlaces;
+            let endLetterOfSelectedNextWord = END_LETTER[selectedNextWord];
+            this.response.speak(this.t('NEXT_PLACE_NAME_STARTING_FROM_MESSAGE') + endLetterOfCurrentWord + this.t('IS') + selectedNextWord)
+                .listen(this.t('SAY_A_PLACE_NAME_STARTING_FROM_LETTER_MESSAGE') + endLetterOfSelectedNextWord);
+            this.emit(':responseReady');
+        }
+        else{
+            //Won the game!
+            this.handler.state = states.STARTMODE;
+            this.attributes['gamesPlayed']++;
+            this.response.speak(this.t('I_DONT_KNOW_ANY_MORE_PLACE_NAME_STARTING_FROM_MESSAGE') + endLetterOfCurrentWord 
+                + this.t('YOUR_HAVE_WON_THE_GAME'))
+                .listen(this.t('YES_OR_NO_MESSAGE'));
+            this.emit(':responseReady');
+        }
     }
 };
 
